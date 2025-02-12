@@ -1,7 +1,11 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  setBoardView: (isBoardView: boolean) => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ setBoardView }) => {
   const { user, logout } = useAuth();
 
   return (
@@ -12,8 +16,18 @@ const Navbar: React.FC = () => {
             <div>
               <h1 className="text-2xl font-bold text-purple-500">TaskBuddy</h1>
               <span>
-                <span className="p-3 cursor-pointer">List</span>
-                <span className="p-3 cursor-pointer">Board</span>
+                <span
+                  className="p-3 cursor-pointer"
+                  onClick={() => setBoardView(false)}
+                >
+                  List
+                </span>
+                <span
+                  className="p-3 cursor-pointer"
+                  onClick={() => setBoardView(true)}
+                >
+                  Board
+                </span>
               </span>
             </div>
             <div>

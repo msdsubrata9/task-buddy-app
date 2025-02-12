@@ -5,6 +5,11 @@ import Navbar from "./Navbar";
 const Login: React.FC = () => {
   const { user, login } = useAuth();
 
+  // Dummy setBoardView function
+  const setBoardView = (isBoardView: boolean) => {
+    console.log("setBoardView called with:", isBoardView);
+  };
+
   return (
     <div className="flex items-center h-screen pl-5">
       <div>
@@ -14,7 +19,7 @@ const Login: React.FC = () => {
           all-in-one task management app.
         </h5>
         {user ? (
-          <Navbar />
+          <Navbar setBoardView={setBoardView} />
         ) : (
           <button
             className="mt-2 px-8 py-4 bg-black text-white rounded-full"

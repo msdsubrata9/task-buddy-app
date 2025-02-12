@@ -10,8 +10,8 @@ interface TaskModalProps {
 const TaskModal: React.FC<TaskModalProps> = ({ task, onClose, onSave }) => {
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [status, setStatus] = useState("");
-  const [category, setCategory] = useState("");
+  const [status, setStatus] = useState("todo"); // Default status to "todo"
+  const [category, setCategory] = useState("Work"); // Default category to "Work"
 
   useEffect(() => {
     if (task) {
@@ -31,7 +31,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-md shadow-md w-1/2">
+      <div className="bg-white p-8 rounded-md shadow-md w-1/2">
         <h2 className="text-xl font-bold mb-4">
           {task ? "Edit Task" : "Add Task"}
         </h2>
@@ -71,13 +71,15 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onClose, onSave }) => {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Category</label>
-            <input
-              type="text"
+            <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="w-full px-3 py-2 border rounded-md"
               required
-            />
+            >
+              <option value="Work">Work</option>
+              <option value="Personal">Personal</option>
+            </select>
           </div>
           <div className="flex justify-end">
             <button

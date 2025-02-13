@@ -6,6 +6,7 @@ import TaskBoard from "./TaskBoard";
 import SearchBar from "./SearchBar";
 import TaskActions from "./TaskActions";
 import TaskAccordion from "./TaskAccordion";
+import TaskHeader from "./TaskHeader";
 import {
   fetchTasks,
   deleteTask,
@@ -162,19 +163,12 @@ const TaskList = () => {
         />
       )}
 
-      <div className="flex items-center justify-between mb-4">
-        <div className="grid grid-cols-5 gap-8 p-4 bg-gray-200 rounded-md font-semibold text-gray-700 w-full">
-          <div>Task Name</div>
-          <div className="flex items-center">
-            Due On
-            <button onClick={handleSortOrderChange} className="ml-2">
-              {sortOrder === "asc" ? "↑" : "↓"}
-            </button>
-          </div>
-          <div>Task Status</div>
-          <div>Task Category</div>
-        </div>
-      </div>
+      {!isBoardView && (
+        <TaskHeader
+          sortOrder={sortOrder}
+          onSortOrderChange={handleSortOrderChange}
+        />
+      )}
 
       {!isBoardView ? (
         <div>

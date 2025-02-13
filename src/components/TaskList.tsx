@@ -20,6 +20,13 @@ const TaskList = () => {
   const [isBoardView, setBoardView] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterDueDate, setFilterDueDate] = useState("");
+  const [expanded, setExpanded] = useState<string[]>([
+    "todo",
+    "in-progress",
+    "complete",
+  ]);
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -30,7 +37,7 @@ const TaskList = () => {
   }, []);
 
   const getTasksByStatus = (status: string) => {
-    return tasks.filter((task) => task.status === status);
+    return filteredTasks.filter((task) => task.status === status);
   };
 
   const handleDelete = async (id: string) => {
@@ -52,20 +59,49 @@ const TaskList = () => {
     setSearchQuery(query);
   };
 
+  const handleFilterByCategory = (category: string) => {
+    setFilterCategory(category);
+  };
+
+  const handleFilterByDueDate = (dueDate: string) => {
+    setFilterDueDate(dueDate);
+  };
+
   const handleEdit = (task: Task) => {
     setSelectedTask(task);
     setModalOpen(true);
   };
 
-  const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleAccordionChange =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded((prevExpanded) =>
+        isExpanded
+          ? [...prevExpanded, panel]
+          : prevExpanded.filter((p) => p !== panel)
+      );
+    };
+
+  const filteredTasks = tasks.filter((task) => {
+    const matchesQuery = task.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesCategory = filterCategory
+      ? task.category === filterCategory
+      : true;
+    const matchesDueDate = filterDueDate
+      ? task.dueDate === filterDueDate
+      : true;
+    return matchesQuery && matchesCategory && matchesDueDate;
+  });
 
   return (
     <div>
       <Navbar setBoardView={setBoardView} />
       <div className="flex items-center m-7 justify-between">
-        <Filter />
+        <Filter
+          onFilterByCategory={handleFilterByCategory}
+          onFilterByDueDate={handleFilterByDueDate}
+        />
         <SearchBar
           onSearch={handleSearch}
           onAddTask={() => {
@@ -88,7 +124,11 @@ const TaskList = () => {
           {/* Accordion Sections */}
           <div>
             {["todo", "in-progress", "complete"].map((status) => (
-              <Accordion key={status}>
+              <Accordion
+                key={status}
+                expanded={expanded.includes(status)}
+                onChange={handleAccordionChange(status)}
+              >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <h2 className="text-lg font-semibold text-gray-700 capitalize">
                     {status.replace("-", " ")}

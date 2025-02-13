@@ -28,6 +28,7 @@ const TaskList = () => {
     "complete",
   ]);
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -111,7 +112,19 @@ const TaskList = () => {
     });
   };
 
-  const filteredTasks = tasks.filter((task) => {
+  const handleSortOrderChange = () => {
+    setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
+  };
+
+  const sortedTasks = tasks.sort((a, b) => {
+    if (sortOrder === "asc") {
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    } else {
+      return new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime();
+    }
+  });
+
+  const filteredTasks = sortedTasks.filter((task) => {
     const matchesQuery = task.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -149,31 +162,36 @@ const TaskList = () => {
         />
       )}
 
-      {!isBoardView ? (
-        <>
-          <div className="grid grid-cols-5 gap-8 p-4 bg-gray-200 rounded-md font-semibold text-gray-700 mb-4">
-            <div>Task Name</div>
-            <div>Due On</div>
-            <div>Task Status</div>
-            <div>Task Category</div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="grid grid-cols-5 gap-8 p-4 bg-gray-200 rounded-md font-semibold text-gray-700 w-full">
+          <div>Task Name</div>
+          <div className="flex items-center">
+            Due On
+            <button onClick={handleSortOrderChange} className="ml-2">
+              {sortOrder === "asc" ? "↑" : "↓"}
+            </button>
           </div>
+          <div>Task Status</div>
+          <div>Task Category</div>
+        </div>
+      </div>
 
-          <div>
-            {["todo", "in-progress", "complete"].map((status) => (
-              <TaskAccordion
-                key={status}
-                status={status}
-                tasks={getTasksByStatus(status)}
-                expanded={expanded}
-                onAccordionChange={handleAccordionChange}
-                selectedTasks={selectedTasks}
-                onTaskSelect={handleTaskSelect}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        </>
+      {!isBoardView ? (
+        <div>
+          {["todo", "in-progress", "complete"].map((status) => (
+            <TaskAccordion
+              key={status}
+              status={status}
+              tasks={getTasksByStatus(status)}
+              expanded={expanded}
+              onAccordionChange={handleAccordionChange}
+              selectedTasks={selectedTasks}
+              onTaskSelect={handleTaskSelect}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
       ) : (
         <TaskBoard
           tasks={filteredTasks}

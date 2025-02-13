@@ -27,6 +27,7 @@ const TaskList = () => {
     "in-progress",
     "complete",
   ]);
+  const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -43,6 +44,25 @@ const TaskList = () => {
   const handleDelete = async (id: string) => {
     await deleteTask(id);
     setTasks(tasks.filter((task) => task.id !== id));
+  };
+
+  const handleBatchDelete = async () => {
+    const tasksToDelete = Array.from(selectedTasks);
+    await Promise.all(tasksToDelete.map((id) => deleteTask(id)));
+    setTasks(tasks.filter((task) => !selectedTasks.has(task.id)));
+    setSelectedTasks(new Set());
+  };
+
+  const handleBatchStatusChange = async (status: string) => {
+    const tasksToUpdate = Array.from(selectedTasks);
+    await Promise.all(
+      tasksToUpdate.map((id) =>
+        updateTask({ ...tasks.find((task) => task.id === id)!, status })
+      )
+    );
+    const data = await fetchTasks();
+    setTasks(data as Task[]);
+    setSelectedTasks(new Set());
   };
 
   const handleSave = async (task: Task) => {
@@ -74,12 +94,22 @@ const TaskList = () => {
 
   const handleAccordionChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded((prevExpanded) =>
-        isExpanded
-          ? [...prevExpanded, panel]
-          : prevExpanded.filter((p) => p !== panel)
+      setExpanded(
+        isExpanded ? [...expanded, panel] : expanded.filter((p) => p !== panel)
       );
     };
+
+  const handleTaskSelect = (id: string) => {
+    setSelectedTasks((prevSelectedTasks) => {
+      const newSelectedTasks = new Set(prevSelectedTasks);
+      if (newSelectedTasks.has(id)) {
+        newSelectedTasks.delete(id);
+      } else {
+        newSelectedTasks.add(id);
+      }
+      return newSelectedTasks;
+    });
+  };
 
   const filteredTasks = tasks.filter((task) => {
     const matchesQuery = task.title
@@ -111,10 +141,30 @@ const TaskList = () => {
         />
       </div>
 
+      {selectedTasks.size > 0 && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 bg-gray-400  p-4 rounded-md shadow-md z-10">
+          <select
+            onChange={(e) => handleBatchStatusChange(e.target.value)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          >
+            <option value="">Change Status</option>
+            <option value="todo">To Do</option>
+            <option value="in-progress">In Progress</option>
+            <option value="complete">Complete</option>
+          </select>
+          <button
+            onClick={handleBatchDelete}
+            className="bg-red-500 text-white px-4 py-2 rounded-md"
+          >
+            Delete Selected
+          </button>
+        </div>
+      )}
+
       {!isBoardView ? (
         <>
           {/* Table Headers */}
-          <div className="grid grid-cols-4 gap-4 p-4 bg-gray-200 rounded-md font-semibold text-gray-700 mb-4">
+          <div className="grid grid-cols-5 gap-8 p-4 bg-gray-200 rounded-md font-semibold text-gray-700 mb-4">
             <div>Task Name</div>
             <div>Due On</div>
             <div>Task Status</div>
@@ -139,9 +189,17 @@ const TaskList = () => {
                     getTasksByStatus(status).map((task) => (
                       <div
                         key={task.id}
-                        className="grid grid-cols-4 gap-4 p-3 bg-white rounded-md shadow-md mb-3"
+                        className="grid grid-cols-5 gap-4 p-3 bg-white rounded-md shadow-md mb-3"
                       >
-                        <div>{task.title}</div>
+                        <div>
+                          <input
+                            className="mr-2"
+                            type="checkbox"
+                            checked={selectedTasks.has(task.id)}
+                            onChange={() => handleTaskSelect(task.id)}
+                          />
+                          {task.title}
+                        </div>
                         <div>{task.dueDate}</div>
                         <div>{task.status}</div>
                         <div>{task.category}</div>

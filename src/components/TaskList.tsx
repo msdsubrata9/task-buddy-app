@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import Filter from "./Filter";
-import TaskModal from "./TaskModal"; // Import the modal component
-import TaskBoard from "./TaskBoard"; // Import the TaskBoard component
-import SearchBar from "./SearchBar"; // Import the SearchBar component
-import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import TaskModal from "./TaskModal";
+import TaskBoard from "./TaskBoard";
+import SearchBar from "./SearchBar";
+import TaskActions from "./TaskActions";
+import TaskAccordion from "./TaskAccordion";
 import {
   fetchTasks,
   deleteTask,
   createTask,
   updateTask,
-} from "../services/tasks"; // Include createTask and updateTask services
+} from "../services/tasks";
 import { Task } from "../utils/types";
 
 const TaskList = () => {
@@ -72,7 +72,7 @@ const TaskList = () => {
       await createTask(task);
     }
     const data = await fetchTasks();
-    setTasks(data as Task[]); // Refresh task list after adding or editing
+    setTasks(data as Task[]);
   };
 
   const handleSearch = (query: string) => {
@@ -142,28 +142,15 @@ const TaskList = () => {
       </div>
 
       {selectedTasks.size > 0 && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 bg-gray-400  p-4 rounded-md shadow-md z-10">
-          <select
-            onChange={(e) => handleBatchStatusChange(e.target.value)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
-          >
-            <option value="">Change Status</option>
-            <option value="todo">To Do</option>
-            <option value="in-progress">In Progress</option>
-            <option value="complete">Complete</option>
-          </select>
-          <button
-            onClick={handleBatchDelete}
-            className="bg-red-500 text-white px-4 py-2 rounded-md"
-          >
-            Delete Selected
-          </button>
-        </div>
+        <TaskActions
+          selectedTasks={selectedTasks}
+          onBatchStatusChange={handleBatchStatusChange}
+          onBatchDelete={handleBatchDelete}
+        />
       )}
 
       {!isBoardView ? (
         <>
-          {/* Table Headers */}
           <div className="grid grid-cols-5 gap-8 p-4 bg-gray-200 rounded-md font-semibold text-gray-700 mb-4">
             <div>Task Name</div>
             <div>Due On</div>
@@ -171,59 +158,19 @@ const TaskList = () => {
             <div>Task Category</div>
           </div>
 
-          {/* Accordion Sections */}
           <div>
             {["todo", "in-progress", "complete"].map((status) => (
-              <Accordion
+              <TaskAccordion
                 key={status}
-                expanded={expanded.includes(status)}
-                onChange={handleAccordionChange(status)}
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <h2 className="text-lg font-semibold text-gray-700 capitalize">
-                    {status.replace("-", " ")}
-                  </h2>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {getTasksByStatus(status).length > 0 ? (
-                    getTasksByStatus(status).map((task) => (
-                      <div
-                        key={task.id}
-                        className="grid grid-cols-5 gap-4 p-3 bg-white rounded-md shadow-md mb-3"
-                      >
-                        <div>
-                          <input
-                            className="mr-2"
-                            type="checkbox"
-                            checked={selectedTasks.has(task.id)}
-                            onChange={() => handleTaskSelect(task.id)}
-                          />
-                          {task.title}
-                        </div>
-                        <div>{task.dueDate}</div>
-                        <div>{task.status}</div>
-                        <div>{task.category}</div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleEdit(task)}
-                            className="px-2 py-1 bg-blue-500 text-white rounded-md"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(task.id)}
-                            className="px-2 py-1 bg-red-500 text-white rounded-md"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500">No tasks in this section.</p>
-                  )}
-                </AccordionDetails>
-              </Accordion>
+                status={status}
+                tasks={getTasksByStatus(status)}
+                expanded={expanded}
+                onAccordionChange={handleAccordionChange}
+                selectedTasks={selectedTasks}
+                onTaskSelect={handleTaskSelect}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         </>
@@ -236,7 +183,6 @@ const TaskList = () => {
         />
       )}
 
-      {/* Task Modal */}
       {isModalOpen && (
         <TaskModal
           task={selectedTask}

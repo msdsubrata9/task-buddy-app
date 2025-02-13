@@ -11,7 +11,7 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
 }) => {
   return (
     <div className="flex items-center justify-between mb-4">
-      <div className="grid grid-cols-5 gap-8 p-4 bg-gray-200 rounded-md font-semibold text-gray-700 w-full">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-200 rounded-md font-semibold text-gray-700 w-full">
         <div>Task Name</div>
         <div className="flex items-center">
           Due On
@@ -19,8 +19,8 @@ const TaskHeader: React.FC<TaskHeaderProps> = ({
             {sortOrder === "asc" ? "↑" : "↓"}
           </button>
         </div>
-        <div>Task Status</div>
-        <div>Task Category</div>
+        <div className="hidden md:block">Task Status</div>
+        <div className="hidden md:block">Task Category</div>
       </div>
     </div>
   );

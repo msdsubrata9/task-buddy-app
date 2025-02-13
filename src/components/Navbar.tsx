@@ -1,4 +1,5 @@
 import React from "react";
+import useWindowSize from "../utils/useWindowSize";
 import { useAuth } from "../context/AuthContext";
 
 interface NavbarProps {
@@ -7,38 +8,35 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ setBoardView }) => {
   const { user, logout } = useAuth();
+  const { width } = useWindowSize();
+  const isMobile = width <= 768;
 
   return (
-    <div>
-      <div>
+    <div className="bg-purple-500 p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-white">TaskBuddy</h1>
         {user && (
-          <div className="flex justify-between m-7">
-            <div>
-              <h1 className="text-2xl font-bold text-purple-500">TaskBuddy</h1>
-              <span>
-                <span
-                  className="p-3 cursor-pointer"
-                  onClick={() => setBoardView(false)}
-                >
-                  List
-                </span>
-                <span
-                  className="p-3 cursor-pointer"
-                  onClick={() => setBoardView(true)}
-                >
-                  Board
-                </span>
-              </span>
-            </div>
-            <div>
-              <p>{user.displayName}</p>
-              <button
-                onClick={logout}
-                className="mt-2 px-4 py-2 border-2 rounded-full"
+          <div className="flex items-center">
+            <span
+              className="p-3 cursor-pointer text-white"
+              onClick={() => setBoardView(false)}
+            >
+              List
+            </span>
+            {!isMobile && (
+              <span
+                className="p-3 cursor-pointer text-white"
+                onClick={() => setBoardView(true)}
               >
-                Logout
-              </button>
-            </div>
+                Board
+              </span>
+            )}
+            <button
+              onClick={logout}
+              className="ml-4 p-2 bg-red-500 text-white rounded-md"
+            >
+              Logout
+            </button>
           </div>
         )}
       </div>

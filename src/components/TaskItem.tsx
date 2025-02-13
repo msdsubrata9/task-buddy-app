@@ -17,7 +17,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onDelete,
 }) => {
   return (
-    <div className="grid grid-cols-5 gap-4 p-3 bg-white rounded-md shadow-md mb-3">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-3 bg-white rounded-md shadow-md mb-3">
       <div>
         <input
           className="mr-2"
@@ -28,8 +28,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
         {task.title}
       </div>
       <div>{task.dueDate}</div>
-      <div>{task.status}</div>
-      <div>{task.category}</div>
+      <div className="hidden md:block">{task.status}</div>
+      <div className="hidden md:block">{task.category}</div>
       <div className="flex gap-2">
         <button
           onClick={() => onEdit(task)}

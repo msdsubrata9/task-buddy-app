@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Task } from "../utils/types";
 
 interface TaskModalProps {
@@ -30,8 +30,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-8 rounded-md shadow-md w-1/2">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-8 rounded-md shadow-md w-full max-w-md mx-4">
         <h2 className="text-xl font-bold mb-4">
           {task ? "Edit Task" : "Add Task"}
         </h2>
@@ -62,7 +62,6 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onClose, onSave }) => {
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               className="w-full px-3 py-2 border rounded-md"
-              required
             >
               <option value="todo">To Do</option>
               <option value="in-progress">In Progress</option>
@@ -75,10 +74,10 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onClose, onSave }) => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="w-full px-3 py-2 border rounded-md"
-              required
             >
               <option value="Work">Work</option>
               <option value="Personal">Personal</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div className="flex justify-end">

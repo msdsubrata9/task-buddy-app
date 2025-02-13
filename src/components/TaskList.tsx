@@ -7,6 +7,7 @@ import SearchBar from "./SearchBar";
 import TaskActions from "./TaskActions";
 import TaskAccordion from "./TaskAccordion";
 import TaskHeader from "./TaskHeader";
+import useWindowSize from "../utils/useWindowSize";
 import {
   fetchTasks,
   deleteTask,
@@ -30,6 +31,9 @@ const TaskList = () => {
   ]);
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const { width } = useWindowSize();
+  const isMobile = width <= 768;
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -141,18 +145,20 @@ const TaskList = () => {
   return (
     <div>
       <Navbar setBoardView={setBoardView} />
-      <div className="flex items-center m-7 justify-between">
+      <div className="flex flex-col md:flex-row items-center m-7 justify-between">
         <Filter
           onFilterByCategory={handleFilterByCategory}
           onFilterByDueDate={handleFilterByDueDate}
         />
-        <SearchBar
-          onSearch={handleSearch}
-          onAddTask={() => {
-            setSelectedTask(null);
-            setModalOpen(true);
-          }}
-        />
+        <div className="flex items-center mt-4 md:mt-0">
+          <SearchBar
+            onSearch={handleSearch}
+            onAddTask={() => {
+              setSelectedTask(null);
+              setModalOpen(true);
+            }}
+          />
+        </div>
       </div>
 
       {selectedTasks.size > 0 && (
@@ -163,14 +169,14 @@ const TaskList = () => {
         />
       )}
 
-      {!isBoardView && (
+      {!isBoardView && !isMobile && (
         <TaskHeader
           sortOrder={sortOrder}
           onSortOrderChange={handleSortOrderChange}
         />
       )}
 
-      {!isBoardView ? (
+      {!isBoardView || isMobile ? (
         <div>
           {["todo", "in-progress", "complete"].map((status) => (
             <TaskAccordion

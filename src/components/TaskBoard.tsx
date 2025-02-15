@@ -69,6 +69,10 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
                         className={`p-3 bg-white rounded-md shadow-md mb-3 ${
                           snapshot.isDragging ? "bg-blue-100" : "bg-white"
                         }`}
+                        style={{
+                          ...provided.draggableProps.style,
+                          transition: "transform 0.2s ease",
+                        }}
                       >
                         <h3 className="text-md font-semibold">{task.title}</h3>
                         <p className="text-sm text-gray-500">
